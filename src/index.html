@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Aplikasi Cerita - Bagikan dan jelajahi cerita dari seluruh dunia"
+    />
+    <meta name="theme-color" content="#0d1b2a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="shortcut icon" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+    <title>Aplikasi Cerita</title>
+
+    <script type="module" src="/scripts/index.js"></script>
+  </head>
+  <body>
+    <!-- Skip to content link untuk aksesibilitas -->
+    <a href="#main-content" class="skip-to-content">Lompat ke konten utama</a>
+
+    <header role="banner">
+      <div class="main-header container">
+        <a
+          class="brand-name"
+          href="#/"
+          aria-label="Aplikasi Cerita - Halaman Beranda"
+          >Aplikasi Cerita</a
+        >
+
+        <nav
+          id="navigation-drawer"
+          class="navigation-drawer"
+          role="navigation"
+          aria-label="Navigasi utama"
+        >
+          <ul id="nav-list" class="nav-list">
+            <li><a href="#/">Beranda</a></li>
+            <li><a href="#/stories">Cerita</a></li>
+            <li><a href="#/add-story">Tambah Cerita</a></li>
+            <li><a href="#/register">Register</a></li>
+            <li><a href="#/about">Tentang</a></li>
+            <li><a href="#/login">Login</a></li>
+          </ul>
+        </nav>
+
+        <button
+          id="drawer-button"
+          class="drawer-button"
+          aria-label="Buka menu navigasi"
+          aria-expanded="false"
+          aria-controls="navigation-drawer"
+        >
+          ☰
+        </button>
+      </div>
+    </header>
+
+    <main id="main-content" class="main-content" role="main"></main>
+
+    <footer role="contentinfo">
+      <div class="footer-content container">
+        <p>&copy; 2024 Aplikasi Cerita. Semua hak dilindungi.</p>
+      </div>
+    </footer>
+  </body>
+</html>

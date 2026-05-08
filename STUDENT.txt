@@ -1,0 +1,189 @@
+APP_URL=https://cerita-app.netlify.app
+MAP_SERVICE_API_KEY=No API key required (menggunakan OpenStreetMap yang gratis)
+
+═══════════════════════════════════════════════════════════════════════
+DESKRIPSI PROYEK: APLIKASI CERITA
+═══════════════════════════════════════════════════════════════════════
+
+Nama Aplikasi  : Aplikasi Cerita
+Deskripsi      : Progressive Web Application (PWA) untuk melihat, berbagi, dan
+                 menyimpan cerita dari seluruh dunia dengan peta interaktif,
+                 push notification, dukungan offline, dan IndexedDB.
+
+API YANG DIGUNAKAN:
+- Story API: https://story-api.dicoding.dev/v1
+- Method: GET (stories), POST (tambah cerita, subscribe notifikasi), DELETE (unsubscribe)
+- Push Notification VAPID Public Key: BCCs2eonMI-6H2ctvFaWg-UYdDv387Vno_bzUzALpB442r2lCnsHmtrx8biyPi_E-1fSGABK_Qs_GlvPoJJqxbk
+
+MAP LIBRARY:
+- Leaflet.js (CDN: https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/)
+- OpenStreetMap + Esri Satellite Tile Layer
+
+═══════════════════════════════════════════════════════════════════════
+KRITERIA SUBMISSION 2
+═══════════════════════════════════════════════════════════════════════
+
+KRITERIA 1: MEMPERTAHANKAN KRITERIA SUBMISSION SEBELUMNYA
+✓ SPA dengan hash routing (#/) — navigasi tanpa reload
+✓ View Transitions API untuk animasi antar halaman
+✓ Peta Leaflet dengan marker, popup, multiple tile layers (OSM + Esri)
+✓ Sinkronisasi list-peta (klik story → map center & popup terbuka)
+✓ Tambah cerita: form lengkap, WebRTC camera, file upload, map picker
+✓ Aksesibilitas: skip-to-content, ARIA roles/labels, keyboard navigation
+✓ Semantic HTML: header, nav, main, footer, section, article, aside
+
+KRITERIA 2: PUSH NOTIFICATION (Advanced Level)
+✓ Service Worker terdaftar dan aktif
+✓ Push notification ditampilkan melalui browser via service worker
+✓ Notifikasi dinamis: judul, icon, dan pesan dari payload server (data event)
+✓ Tombol toggle 🔔/🔕 di navigation bar untuk enable/disable subscription
+✓ Subscription dikirim ke Dicoding API (POST /notifications/subscribe)
+✓ Unsubscribe dikirim ke Dicoding API (DELETE /notifications/subscribe)
+✓ Action button "Lihat Cerita" di notifikasi untuk navigasi ke halaman stories
+
+KRITERIA 3: PWA — INSTALASI DAN OFFLINE (Advanced Level)
+✓ Web App Manifest lengkap:
+    - name, short_name, description, theme_color (#0d1b2a)
+    - icons: 192x192 & 512x512 (purpose: any maskable)
+    - display: standalone
+    - shortcuts: Lihat Cerita, Tambah Cerita, Favorit
+    - screenshots: desktop (1280x720) & mobile (750x1334)
+✓ Install prompt muncul di browser (pop-up installable apps)
+✓ Tidak ada warning pada Chrome DevTools → Application → Manifest
+✓ Offline support (app shell via CacheFirst precache)
+✓ Data API di-cache dengan StaleWhileRevalidate (konten tetap muncul saat offline)
+✓ Map tiles di-cache dengan CacheFirst (7 hari)
+✓ CDN assets (Leaflet) di-cache dengan CacheFirst (30 hari)
+✓ Banner otomatis muncul saat mode offline
+
+KRITERIA 4: INDEXEDDB (Advanced Level)
+✓ Object store "favorites":
+    - saveFavorite(story)  — Create
+    - getFavorites()       — Read (dengan search & sort)
+    - deleteFavorite(id)   — Delete
+✓ Object store "pending-stories" (offline queue):
+    - savePendingStory()   — Create saat offline
+    - getPendingStories()  — Read di halaman Favorit
+    - deletePendingStory() — Delete setelah sync
+✓ Halaman /favorites dengan:
+    - Daftar cerita yang disimpan
+    - Search (debounce 300ms)
+    - Sort: Terbaru/Terlama/Nama A-Z/Nama Z-A
+    - Hapus individu
+✓ Tombol ♡/❤️ di setiap story card untuk toggle favorit
+✓ Offline sync: cerita dibuat saat offline → disimpan lokal → tombol "Sinkronkan Sekarang" di halaman Favorit
+✓ Auto-detect offline saat membuat cerita, simpan ke pending-stories
+
+KRITERIA 5: DEPLOYMENT
+✓ Deployed ke: https://cerita-app.netlify.app
+✓ Platform: Netlify
+✓ URL dapat diakses secara publik
+✓ HTTPS aktif (diperlukan untuk Push Notification & PWA)
+
+═══════════════════════════════════════════════════════════════════════
+HALAMAN YANG TERSEDIA
+═══════════════════════════════════════════════════════════════════════
+
+1. Home (/#/)
+   - Hero section dengan CTA
+   - Feature cards
+
+2. Login (/#/login)
+   - Form login dengan validasi
+
+3. Register (/#/register)
+   - Form registrasi dengan validasi password
+
+4. Stories (/#/stories)
+   - List cerita dengan tombol ♡ Favorit di setiap item
+   - Peta interaktif dengan marker dan popup
+   - Sinkronisasi list-peta
+
+5. Add Story (/#/add-story)
+   - Form tambah cerita
+   - WebRTC camera capture / file upload
+   - Map picker lokasi
+   - Offline detection: simpan ke IndexedDB jika tidak ada koneksi
+
+6. Favorites (/#/favorites)
+   - Daftar cerita favorit dari IndexedDB
+   - Search dan sort
+   - Section pending stories untuk offline sync
+   - Tombol "Sinkronkan Sekarang"
+
+7. About (/#/about)
+   - Informasi aplikasi
+
+═══════════════════════════════════════════════════════════════════════
+STRUKTUR FOLDER
+═══════════════════════════════════════════════════════════════════════
+
+src/
+├── index.html
+├── public/
+│   ├── favicon.png
+│   ├── icons/
+│   │   ├── icon-192x192.png
+│   │   └── icon-512x512.png
+│   └── screenshots/
+│       ├── screenshot-1.png  (desktop, 1280x720)
+│       └── screenshot-2.png  (mobile, 750x1334)
+└── scripts/
+    ├── index.js              (SW registration, online/offline events)
+    ├── config.js             (BASE_URL, VAPID_PUBLIC_KEY)
+    ├── sw.js                 (Service Worker: Workbox precache, push, click)
+    ├── models/
+    │   ├── api.js            (fetch wrappers: login, stories, etc.)
+    │   └── db.js             (IndexedDB: favorites + pending-stories)
+    ├── utils/
+    │   ├── index.js
+    │   └── notification-helper.js  (subscribe/unsubscribe push)
+    ├── pages/
+    │   └── app.js            (Router, nav, notification toggle button)
+    ├── routes/
+    │   ├── routes.js         (hash route definitions)
+    │   └── url-parser.js
+    ├── views/
+    │   ├── home-view.js
+    │   ├── stories-view.js   (+ tombol ♡ favorit)
+    │   ├── add-story-view.js
+    │   ├── favorites-view.js (NEW)
+    │   ├── login-view.js
+    │   ├── register-view.js
+    │   └── about-view.js
+    └── presenters/
+        ├── home-presenter.js
+        ├── stories-presenter.js   (+ IndexedDB favorite handler)
+        ├── add-story-presenter.js (+ offline detection)
+        ├── favorites-presenter.js (NEW: search, sort, delete, sync)
+        ├── login-presenter.js
+        ├── register-presenter.js
+        └── about-presenter.js
+
+═══════════════════════════════════════════════════════════════════════
+TEKNOLOGI YANG DIGUNAKAN
+═══════════════════════════════════════════════════════════════════════
+
+- JavaScript ES6+ (Classes, Private Fields, Arrow Functions, Async/Await)
+- HTML5 Semantic Elements
+- CSS3 (Grid, Flexbox, Animations, Media Queries, CSS Custom Properties)
+- Vite 6 + vite-plugin-pwa (build tool)
+- Workbox (service worker: precache, CacheFirst, StaleWhileRevalidate)
+- Leaflet.js (peta interaktif, multiple tile layers)
+- Fetch API + Web Push API + PushManager
+- IndexedDB (native API, tanpa library tambahan)
+- View Transitions API
+- MediaDevices API (WebRTC camera)
+- LocalStorage (auth token)
+
+═══════════════════════════════════════════════════════════════════════
+CARA MENJALANKAN (DEVELOPMENT)
+═══════════════════════════════════════════════════════════════════════
+
+1. npm install
+2. npm run dev
+3. Buka http://localhost:5173
+   (Service Worker aktif saat dev dengan devOptions.enabled: true)
+
+CATATAN: Push notification & full PWA features memerlukan HTTPS.
+Gunakan npm run build && npm run preview untuk test production mode.
