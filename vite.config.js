@@ -2,8 +2,8 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import { VitePWA } from 'vite-plugin-pwa';
 
-// Base path: '/' untuk dev/preview lokal, '/Web_cerita_fe2/' saat build di GitHub Actions
-const base = process.env.GITHUB_ACTIONS ? '/Web_cerita_fe2/' : '/';
+// Base path: '/' untuk dev/preview lokal, '/web_cerita2/' saat build di GitHub Actions
+const base = process.env.GITHUB_ACTIONS ? '/web_cerita2/' : '/';
 
 // https://vitejs.dev/config/
 export default defineConfig({
