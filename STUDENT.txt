@@ -75,8 +75,8 @@ KRITERIA 4: INDEXEDDB (Advanced Level)
 ✓ Auto-detect offline saat membuat cerita, simpan ke pending-stories
 
 KRITERIA 5: DEPLOYMENT
-✓ Deployed ke: https://cerita-app.netlify.app
-✓ Platform: Netlify
+✓ Deployed ke: https://syrauff.github.io/web_cerita2/
+✓ Platform: Github Pages
 ✓ URL dapat diakses secara publik
 ✓ HTTPS aktif (diperlukan untuk Push Notification & PWA)
 

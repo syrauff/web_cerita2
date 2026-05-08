@@ -8,6 +8,7 @@ export default class FavoritesView {
 
           <div class="favorites-controls">
             <div class="search-wrapper">
+            <label for="favorites-search" class="sr-only">Cari cerita favorit</label>
               <input
                 type="search"
                 id="favorites-search"

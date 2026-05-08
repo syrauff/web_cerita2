@@ -34,7 +34,7 @@ export default class AddStoryView {
 
           <div class="form-row">
             <div class="form-group">
-              <label>Unggah Foto <span class="required">*</span></label>
+              <label for="story-photo">Unggah Foto <span class="required">*</span></label>
               
               <div class="photo-methods" style="display: flex; gap: 10px; margin-bottom: 10px;">
                 <button type="button" id="btn-upload-mode" class="btn-primary" style="padding: 8px 16px; flex: 1;">Unggah File</button>
@@ -70,7 +70,7 @@ export default class AddStoryView {
           </div>
 
           <div class="form-group full-width">
-            <label>Pilih Lokasi di Peta (Opsional)</label>
+            <p class="form-section-label"><strong>Pilih Lokasi di Peta <span class="optional-tag">(Opsional)</span></strong></p>
             <p class="help-text">Klik pada peta untuk menentukan latitude dan longitude cerita Anda</p>
             <div id="add-story-map" class="map-container" role="region" aria-label="Peta untuk memilih lokasi cerita"></div>
             <div class="coordinates-display">

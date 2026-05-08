@@ -1292,3 +1292,18 @@ footer {
     align-items: flex-start;
   }
 }
+
+/* ── FORM SECTION LABELS (non-input labels for sections) ─────────────────── */
+.form-section-label {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.optional-tag {
+  font-weight: normal;
+  color: #888;
+  font-size: 13px;
+}
+
