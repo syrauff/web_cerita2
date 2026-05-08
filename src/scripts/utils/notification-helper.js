@@ -16,12 +16,28 @@ export function urlBase64ToUint8Array(base64String) {
 }
 
 /**
+ * Safely get the active service worker registration without hanging.
+ * Uses getRegistration() instead of .ready to avoid infinite wait.
+ */
+async function getSWRegistration() {
+  if (!('serviceWorker' in navigator)) return null;
+  try {
+    // getRegistration() returns immediately (does NOT wait indefinitely)
+    const registration = await navigator.serviceWorker.getRegistration('/');
+    return registration || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Check if push notifications are currently subscribed.
  */
 export async function isPushSubscribed() {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false;
   try {
-    const registration = await navigator.serviceWorker.ready;
+    const registration = await getSWRegistration();
+    if (!registration) return false;
     const subscription = await registration.pushManager.getSubscription();
     return !!subscription;
   } catch {
@@ -43,7 +59,11 @@ export async function subscribePushNotification() {
       throw new Error('Izin notifikasi ditolak');
     }
 
-    const registration = await navigator.serviceWorker.ready;
+    // Get active SW registration safely
+    const registration = await getSWRegistration();
+    if (!registration) {
+      throw new Error('Service Worker belum aktif. Coba refresh halaman terlebih dahulu.');
+    }
 
     // Check if already subscribed
     let subscription = await registration.pushManager.getSubscription();
@@ -93,7 +113,12 @@ export async function subscribePushNotification() {
  */
 export async function unsubscribePushNotification() {
   try {
-    const registration = await navigator.serviceWorker.ready;
+    const registration = await getSWRegistration();
+    if (!registration) {
+      localStorage.removeItem('push-subscribed');
+      return true;
+    }
+
     const subscription = await registration.pushManager.getSubscription();
 
     if (!subscription) {
