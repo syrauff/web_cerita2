@@ -17,13 +17,14 @@ export function urlBase64ToUint8Array(base64String) {
 
 /**
  * Safely get the active service worker registration without hanging.
- * Uses getRegistration() instead of .ready to avoid infinite wait.
+ * Uses getRegistration() with NO argument so it works on any base path,
+ * including subdirectory deployments like GitHub Pages (/web_cerita2/).
  */
 async function getSWRegistration() {
   if (!('serviceWorker' in navigator)) return null;
   try {
-    // getRegistration() returns immediately (does NOT wait indefinitely)
-    const registration = await navigator.serviceWorker.getRegistration('/');
+    // No argument = uses current page URL → works for any base path
+    const registration = await navigator.serviceWorker.getRegistration();
     return registration || null;
   } catch {
     return null;
