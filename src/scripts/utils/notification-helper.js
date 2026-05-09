@@ -16,15 +16,27 @@ export function urlBase64ToUint8Array(base64String) {
 }
 
 /**
- * Safely get the active service worker registration without hanging.
- * Uses getRegistration() with NO argument so it works on any base path,
- * including subdirectory deployments like GitHub Pages (/web_cerita2/).
+ * Safely get the active service worker registration.
+ *
+ * Strategy:
+ * 1. Try getRegistration() first (immediate, no hang, works for any base path).
+ * 2. If null (SW not yet activated), wait for navigator.serviceWorker.ready
+ *    with a 5-second timeout so the page never hangs indefinitely.
  */
 async function getSWRegistration() {
   if (!('serviceWorker' in navigator)) return null;
   try {
-    // No argument = uses current page URL → works for any base path
-    const registration = await navigator.serviceWorker.getRegistration();
+    // Check if there's already an active registration (any scope)
+    const existing = await navigator.serviceWorker.getRegistration();
+    if (existing) return existing;
+
+    // SW might still be installing/activating — wait up to 5 seconds
+    const registration = await Promise.race([
+      navigator.serviceWorker.ready,
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('SW not ready within 5s')), 5000),
+      ),
+    ]);
     return registration || null;
   } catch {
     return null;
@@ -57,18 +69,20 @@ export async function subscribePushNotification() {
 
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
-      throw new Error('Izin notifikasi ditolak');
+      throw new Error('Izin notifikasi ditolak oleh pengguna');
     }
 
-    // Get active SW registration safely
+    // Get active SW registration (waits up to 5s if still activating)
     const registration = await getSWRegistration();
     if (!registration) {
-      throw new Error('Service Worker belum aktif. Coba refresh halaman terlebih dahulu.');
+      throw new Error(
+        'Service Worker belum aktif. Push notification hanya tersedia pada versi yang sudah di-deploy (HTTPS). ' +
+        'Jika sudah di-deploy, coba refresh halaman dan tunggu beberapa detik.',
+      );
     }
 
-    // Check if already subscribed
+    // Get or create push subscription
     let subscription = await registration.pushManager.getSubscription();
-
     if (!subscription) {
       subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
@@ -97,8 +111,8 @@ export async function subscribePushNotification() {
     });
 
     if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.message || 'Gagal mendaftarkan push notification');
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.message || 'Gagal mendaftarkan push notification ke server');
     }
 
     localStorage.setItem('push-subscribed', 'true');
@@ -121,7 +135,6 @@ export async function unsubscribePushNotification() {
     }
 
     const subscription = await registration.pushManager.getSubscription();
-
     if (!subscription) {
       localStorage.removeItem('push-subscribed');
       return true;
@@ -130,10 +143,10 @@ export async function unsubscribePushNotification() {
     const token = getToken();
     const subscriptionJson = subscription.toJSON();
 
-    // Unsubscribe from browser
+    // Unsubscribe from browser first
     await subscription.unsubscribe();
 
-    // Notify server (best effort)
+    // Notify server (best-effort — browser already unsubscribed)
     if (token) {
       try {
         await fetch(CONFIG.PUSH_SUBSCRIBE_URL, {
@@ -145,7 +158,7 @@ export async function unsubscribePushNotification() {
           body: JSON.stringify({ endpoint: subscriptionJson.endpoint }),
         });
       } catch {
-        // Server deregistration is best-effort; browser unsubscribe already done
+        // ignore server error — browser already unsubscribed
       }
     }
 
