@@ -18,26 +18,29 @@ export function urlBase64ToUint8Array(base64String) {
 /**
  * Safely get the active service worker registration.
  *
- * Strategy:
- * 1. Try getRegistration() first (immediate, no hang, works for any base path).
- * 2. If null (SW not yet activated), wait for navigator.serviceWorker.ready
- *    with a 5-second timeout so the page never hangs indefinitely.
+ * Strategy (in order):
+ * 1. getRegistrations() — find any active SW (works regardless of base path)
+ * 2. navigator.serviceWorker.ready with 8s timeout — wait if SW still installing
+ * Timeout RESOLVES to null (never rejects) so the app never hangs.
  */
 async function getSWRegistration() {
   if (!('serviceWorker' in navigator)) return null;
   try {
-    // Check if there's already an active registration (any scope)
-    const existing = await navigator.serviceWorker.getRegistration();
-    if (existing) return existing;
+    // Check ALL registrations (not just current-URL-scope)
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    if (registrations.length > 0) {
+      // Prefer one with an active SW
+      const active = registrations.find((r) => r.active);
+      if (active) return active;
+      // SW exists but is still installing/waiting — fall through to ready
+    }
 
-    // SW might still be installing/activating — wait up to 5 seconds
-    const registration = await Promise.race([
+    // Wait for SW to finish activating (max 8 seconds, then give up gracefully)
+    const reg = await Promise.race([
       navigator.serviceWorker.ready,
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('SW not ready within 5s')), 5000),
-      ),
+      new Promise((resolve) => setTimeout(() => resolve(null), 8000)),
     ]);
-    return registration || null;
+    return reg || null;
   } catch {
     return null;
   }
